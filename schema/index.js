@@ -1,5 +1,4 @@
 const graphql = require('graphql');
-const _ = require('lodash');
 const Contact = require('../models/contact')
 const Group = require('../models/group')
 

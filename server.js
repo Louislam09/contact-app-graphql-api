@@ -1,32 +1,58 @@
+const { ApolloServer } = require('apollo-server-express');
 const express = require('express');
-const { graphqlHTTP } = require('express-graphql');
-const app = express();
-const PORT = process.env.PORT || 4000;
-const schema = require('./schema');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const { typeDefs } = require("./typeDefs");
+const { resolvers } = require("./resolvers");
+const schema = require("./schema");
 
-// allow cross-domain requests
-app.use(cors());
+const PORT = process.env.PORT || 4000;
 
-// mongoose connection
-mongoose
-	.connect(process.env.MONGO_URI, {
+
+const startServer = async () => {
+	const app = express();
+	app.use(cors());
+
+	const server = new ApolloServer({
+		typeDefs,
+		resolvers,
+		// schema
+	})
+
+	server.applyMiddleware({ app });
+
+	await mongoose.connect(process.env.MONGO_URI, {
 		useNewUrlParser: true,
-        useUnifiedTopology: true
+		useUnifiedTopology: true,
+		useFindAndModify: false
 	})
-	.then(() => console.log('DB CONNECTED'))
-	.catch((err) => console.log(err));
 
-app.use(
-	'/graphql',
-	graphqlHTTP({
-		schema,
-		graphiql: true
-	})
-);
+	app.listen({port: PORT}, () => 
+		console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`)
+	)
+}
 
-app.listen(PORT, () => {
-	console.log(`server running in port ${PORT}`);
-});
+startServer();
+
+// mongoose
+// 	.connect(process.env.MONGO_URI, {
+// 		useNewUrlParser: true,
+//         useUnifiedTopology: true
+// 	})
+// 	.then(() => console.log('DB CONNECTED'))
+// 	.catch((err) => console.log(err));
+
+// app.use(
+// 	'/graphql',
+// 	graphqlHTTP({
+// 		schema,
+// 		graphiql: true
+// 	})
+// );
+
+// app.listen(PORT, () => {
+// 	console.log(`server running in port ${PORT}`);
+// });
+
+
