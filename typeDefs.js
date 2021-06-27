@@ -23,7 +23,7 @@ const typeDefs = gql`
         lastName: String!,
         phone: String!,
         email: String,
-        groups: ID,
+        groups: [ID],
         address: String,
     }
 
@@ -42,8 +42,8 @@ const typeDefs = gql`
 	type Mutation {
         addContact(contactInput: ContactInput!): Contact!
         createGroup(groupInput: GroupInput!): Group!
-        addContactFav(id: ID): Contact!
-        removeContactFav(id: ID): Contact!
+        toggleContactFav(id: ID!,fav: Boolean!): Contact!
+        deleteContact(id: ID!): Contact!
 	}
 `;
 
